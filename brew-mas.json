@@ -1,6 +1,7 @@
 {
   "brew": {
     "formulae": [
+      "zsh",
       "git",
       "curl",
       "wget",
