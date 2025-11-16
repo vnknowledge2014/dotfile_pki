@@ -3,6 +3,8 @@
 # macOS Development Environment Setup
 # Auto-install Homebrew, Zsh, Oh-My-Zsh, mas-cli, ASDF, and programming languages
 
+set -e
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -226,24 +228,25 @@ add_plugin() {
     local plugin_name=$1
     local plugin_url=$2
     
-    if asdf plugin list 2>/dev/null | grep -q "^$plugin_name$"; then
-        print_info "Plugin $plugin_name already installed"
+    print_info "Adding plugin: $plugin_name"
+    
+    if asdf plugin list | grep -q "^$plugin_name$"; then
+        print_warning "Plugin $plugin_name already exists, skipping..."
         return 0
     fi
     
-    print_info "Adding plugin: $plugin_name"
     if [[ -n "$plugin_url" ]]; then
-        if asdf plugin add "$plugin_name" "$plugin_url" 2>&1; then
-            print_success "Added $plugin_name"
+        if asdf plugin add "$plugin_name" "$plugin_url"; then
+            print_success "Added plugin $plugin_name"
         else
-            print_warning "Failed to add $plugin_name"
+            print_error "Failed to add plugin $plugin_name"
             return 1
         fi
     else
-        if asdf plugin add "$plugin_name" 2>&1; then
-            print_success "Added $plugin_name"
+        if asdf plugin add "$plugin_name"; then
+            print_success "Added plugin $plugin_name"
         else
-            print_warning "Failed to add $plugin_name"
+            print_error "Failed to add plugin $plugin_name"
             return 1
         fi
     fi
@@ -342,17 +345,47 @@ main() {
         exit 1
     fi
     
-    print_info "Installing ASDF plugins and languages... (${#plugins[@]} plugins)"
-    for entry in "${plugins[@]}"; do
-        plugin_name="${entry%%=*}"
-        plugin_url="${entry#*=}"
-        add_plugin "$plugin_name" "$plugin_url"
-    done
+    print_info "Step 1: Adding plugins..."
+    echo
+    failed_plugins=()
     
     for entry in "${plugins[@]}"; do
         plugin_name="${entry%%=*}"
-        install_latest "$plugin_name"
+        plugin_url="${entry#*=}"
+        if ! add_plugin "$plugin_name" "$plugin_url"; then
+            failed_plugins+=("$plugin_name")
+        fi
     done
+    
+    echo
+    print_info "Step 2: Installing latest versions..."
+    echo
+    failed_installs=()
+    
+    for entry in "${plugins[@]}"; do
+        plugin_name="${entry%%=*}"
+        
+        # Skip plugins that failed to add
+        if [[ " ${failed_plugins[*]} " =~ " $plugin_name " ]]; then
+            print_warning "Skipping $plugin_name installation (plugin add failed)"
+            continue
+        fi
+        
+        if ! install_latest "$plugin_name"; then
+            failed_installs+=("$plugin_name")
+        fi
+        echo
+    done
+    
+    # Summary
+    echo
+    print_info "=== INSTALLATION SUMMARY ==="
+    if [[ ${#failed_plugins[@]} -eq 0 ]] && [[ ${#failed_installs[@]} -eq 0 ]]; then
+        print_success "All plugins and languages installed successfully!"
+    else
+        [[ ${#failed_plugins[@]} -gt 0 ]] && print_error "Failed to add plugins: ${failed_plugins[*]}"
+        [[ ${#failed_installs[@]} -gt 0 ]] && print_error "Failed to install: ${failed_installs[*]}"
+    fi
     
     configure_tools
     
