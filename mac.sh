@@ -228,9 +228,17 @@ add_plugin() {
     local plugin_name=$1
     local plugin_url=$2
     
-    asdf plugin list | grep -q "^$plugin_name$" && return 0
+    if asdf plugin list 2>/dev/null | grep -q "^$plugin_name$"; then
+        print_info "Plugin $plugin_name already installed"
+        return 0
+    fi
     
-    [[ -n "$plugin_url" ]] && asdf plugin add "$plugin_name" "$plugin_url" || asdf plugin add "$plugin_name"
+    print_info "Adding plugin: $plugin_name"
+    if [[ -n "$plugin_url" ]]; then
+        asdf plugin add "$plugin_name" "$plugin_url" 2>&1 || print_warning "Failed to add $plugin_name"
+    else
+        asdf plugin add "$plugin_name" 2>&1 || print_warning "Failed to add $plugin_name"
+    fi
 }
 
 # Install latest version
@@ -330,7 +338,6 @@ main() {
     for entry in "${plugins[@]}"; do
         plugin_name="${entry%%=*}"
         plugin_url="${entry#*=}"
-        print_info "Adding plugin: $plugin_name"
         add_plugin "$plugin_name" "$plugin_url"
     done
     
