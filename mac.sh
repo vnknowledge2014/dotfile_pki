@@ -3,8 +3,6 @@
 # macOS Development Environment Setup
 # Auto-install Homebrew, Zsh, Oh-My-Zsh, mas-cli, ASDF, and programming languages
 
-set -e
-
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -235,9 +233,19 @@ add_plugin() {
     
     print_info "Adding plugin: $plugin_name"
     if [[ -n "$plugin_url" ]]; then
-        asdf plugin add "$plugin_name" "$plugin_url" 2>&1 || print_warning "Failed to add $plugin_name"
+        if asdf plugin add "$plugin_name" "$plugin_url" 2>&1; then
+            print_success "Added $plugin_name"
+        else
+            print_warning "Failed to add $plugin_name"
+            return 1
+        fi
     else
-        asdf plugin add "$plugin_name" 2>&1 || print_warning "Failed to add $plugin_name"
+        if asdf plugin add "$plugin_name" 2>&1; then
+            print_success "Added $plugin_name"
+        else
+            print_warning "Failed to add $plugin_name"
+            return 1
+        fi
     fi
 }
 
