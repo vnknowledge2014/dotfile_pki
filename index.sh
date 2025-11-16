@@ -124,7 +124,7 @@ source_shell_config() {
 
 # Cài đặt các gói cần thiết
 install_required_packages() {
-    print_info "Cài đặt các gói cần thiết (jq, gnupg)..."
+    print_info "Cài đặt các gói cần thiết (jq, gnupg, tmux)..."
     
     # Dọn dẹp cache và sửa lỗi dependency
     print_info "Dọn dẹp cache và sửa lỗi dependency..."
@@ -144,7 +144,7 @@ install_required_packages() {
     sudo apt --fix-broken install -y
     
     # Cài đặt từng gói riêng biệt
-    local packages=("jq" "gnupg")
+    local packages=("jq" "gnupg" "tmux")
     local failed_packages=()
     
     for package in "${packages[@]}"; do
@@ -314,6 +314,21 @@ setup_certificates() {
         configure_shell_certificates
     else
         print_warning "Thư mục ./certs không tồn tại, bỏ qua bước cài đặt chứng chỉ"
+    fi
+    echo
+}
+
+# Cấu hình tmux
+setup_tmux() {
+    print_info "Cấu hình tmux..."
+    
+    if [ -f "./tmux-config/.tmux.conf" ]; then
+        mkdir -p ~/.config/tmux
+        cp ./tmux-config/.tmux.conf ~/.config/tmux/.tmux.conf
+        ln -sf ~/.config/tmux/.tmux.conf ~/.tmux.conf
+        print_success "Đã cấu hình tmux"
+    else
+        print_warning "Không tìm thấy file tmux-config/.tmux.conf"
     fi
     echo
 }
@@ -780,6 +795,9 @@ main() {
 
     # Cài đặt các gói cần thiết trước
     install_required_packages
+    
+    # Cấu hình tmux
+    setup_tmux
     
     # Load cấu hình từ JSON
     load_config

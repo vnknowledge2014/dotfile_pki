@@ -13,8 +13,9 @@
       "fzf",
       "ripgrep",
       "bat",
-      "exa",
-      "gh"
+      "eza",
+      "gh",
+      "asdf"
     ],
     "casks": [
       "visual-studio-code",
