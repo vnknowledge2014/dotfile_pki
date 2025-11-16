@@ -131,7 +131,6 @@ load_brew_mas_config() {
     
     brew_formulae=()
     brew_casks=()
-    declare -A mas_apps
     
     while IFS= read -r formula; do
         brew_formulae+=("$formula")
@@ -140,10 +139,6 @@ load_brew_mas_config() {
     while IFS= read -r cask; do
         brew_casks+=("$cask")
     done < <(jq -r '.brew.casks[]' "$config_file" 2>/dev/null || true)
-    
-    while IFS='=' read -r key value; do
-        mas_apps["$key"]="$value"
-    done < <(jq -r '.mas | to_entries[] | "\(.key)=\(.value)"' "$config_file" 2>/dev/null || true)
 }
 
 # Install Homebrew packages
@@ -184,20 +179,20 @@ load_config() {
         exit 1
     fi
     
-    declare -A plugins
+    plugins=()
     manual_version_plugins=()
-    declare -A recommended_versions
+    recommended_versions=()
     
-    while IFS='=' read -r key value; do
-        plugins["$key"]="$value"
+    while IFS= read -r line; do
+        plugins+=("$line")
     done < <(jq -r '.plugins | to_entries[] | "\(.key)=\(.value)"' "$config_file")
     
     while IFS= read -r plugin; do
         manual_version_plugins+=("$plugin")
     done < <(jq -r '.special_handling.manual_version[]' "$config_file")
     
-    while IFS='=' read -r key value; do
-        recommended_versions["$key"]="$value"
+    while IFS= read -r line; do
+        recommended_versions+=("$line")
     done < <(jq -r '.special_handling.recommended_versions | to_entries[] | "\(.key)=\(.value)"' "$config_file" 2>/dev/null || true)
 }
 
@@ -255,9 +250,17 @@ install_latest() {
         print_info "Available versions for $plugin_name:"
         asdf list all "$plugin_name" || return 1
         
+        local recommended=""
+        for entry in "${recommended_versions[@]}"; do
+            if [[ "${entry%%=*}" == "$plugin_name" ]]; then
+                recommended="${entry#*=}"
+                break
+            fi
+        done
+        
         local prompt="Enter version for $plugin_name"
-        if [[ -n "${recommended_versions[$plugin_name]}" ]]; then
-            prompt="$prompt (recommended: ${recommended_versions[$plugin_name]})"
+        if [[ -n "$recommended" ]]; then
+            prompt="$prompt (recommended: $recommended)"
         fi
         read -p "$prompt: " version
         
@@ -319,12 +322,15 @@ main() {
     load_config
     
     print_info "Installing ASDF plugins and languages..."
-    for plugin in "${!plugins[@]}"; do
-        add_plugin "$plugin" "${plugins[$plugin]}"
+    for entry in "${plugins[@]}"; do
+        local plugin_name="${entry%%=*}"
+        local plugin_url="${entry#*=}"
+        add_plugin "$plugin_name" "$plugin_url"
     done
     
-    for plugin in "${!plugins[@]}"; do
-        install_latest "$plugin"
+    for entry in "${plugins[@]}"; do
+        local plugin_name="${entry%%=*}"
+        install_latest "$plugin_name"
     done
     
     configure_tools
