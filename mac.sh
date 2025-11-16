@@ -269,17 +269,15 @@ install_latest() {
         print_info "Available versions for $plugin_name:"
         asdf list all "$plugin_name" || return 1
         
-        local recommended=""
-        for entry in "${recommended_versions[@]}"; do
-            if [[ "${entry%%=*}" == "$plugin_name" ]]; then
-                recommended="${entry#*=}"
-                break
-            fi
-        done
-        
+        echo
         local prompt="Enter version for $plugin_name"
-        if [[ -n "$recommended" ]]; then
-            prompt="$prompt (recommended: $recommended)"
+        if [[ ${#recommended_versions[@]} -gt 0 ]]; then
+            for entry in "${recommended_versions[@]}"; do
+                if [[ "${entry%%=*}" == "$plugin_name" ]]; then
+                    prompt="$prompt (recommended: ${entry#*=})"
+                    break
+                fi
+            done
         fi
         read -p "$prompt: " version
         
@@ -297,8 +295,13 @@ install_latest() {
     
     print_info "Installing $plugin_name version $version..."
     if asdf install "$plugin_name" "$version"; then
-        asdf global "$plugin_name" "$version"
         print_success "Installed $plugin_name $version"
+        
+        if asdf set -u "$plugin_name" "$version" --home; then
+            print_success "Set $plugin_name $version as default in home directory"
+        else
+            print_warning "Failed to set $plugin_name $version as default"
+        fi
     else
         print_error "Failed to install $plugin_name"
         return 1
