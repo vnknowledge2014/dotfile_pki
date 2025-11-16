@@ -323,13 +323,13 @@ main() {
     
     print_info "Installing ASDF plugins and languages..."
     for entry in "${plugins[@]}"; do
-        local plugin_name="${entry%%=*}"
-        local plugin_url="${entry#*=}"
+        plugin_name="${entry%%=*}"
+        plugin_url="${entry#*=}"
         add_plugin "$plugin_name" "$plugin_url"
     done
     
     for entry in "${plugins[@]}"; do
-        local plugin_name="${entry%%=*}"
+        plugin_name="${entry%%=*}"
         install_latest "$plugin_name"
     done
     
