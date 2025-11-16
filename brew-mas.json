@@ -1,0 +1,32 @@
+{
+  "brew": {
+    "formulae": [
+      "git",
+      "curl",
+      "wget",
+      "jq",
+      "tree",
+      "htop",
+      "neovim",
+      "tmux",
+      "fzf",
+      "ripgrep",
+      "bat",
+      "exa",
+      "gh"
+    ],
+    "casks": [
+      "visual-studio-code",
+      "iterm2",
+      "docker",
+      "postman",
+      "rectangle",
+      "raycast"
+    ]
+  },
+  "mas": {
+    "1352778147": "Bitwarden",
+    "497799835": "Xcode",
+    "1295203466": "Microsoft Remote Desktop"
+  }
+}
