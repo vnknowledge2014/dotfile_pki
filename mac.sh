@@ -203,13 +203,29 @@ load_config() {
 
 # Configure ASDF
 configure_asdf() {
+    print_info "Configuring ASDF..."
+    
+    if ! brew list asdf &>/dev/null; then
+        print_info "Installing ASDF via Homebrew..."
+        brew install asdf
+    fi
+    
     local shell_config=$(detect_shell_config)
-    grep -q "ASDF Configuration" "$shell_config" 2>/dev/null || cat >> "$shell_config" << 'EOF'
+    if ! grep -q "ASDF Configuration" "$shell_config" 2>/dev/null; then
+        cat >> "$shell_config" << 'EOF'
 
 # ASDF Configuration
 . $(brew --prefix asdf)/libexec/asdf.sh
 EOF
-    source "$shell_config" 2>/dev/null || true
+    fi
+    
+    # Source ASDF for current session
+    if [[ -f "$(brew --prefix asdf)/libexec/asdf.sh" ]]; then
+        . "$(brew --prefix asdf)/libexec/asdf.sh" || true
+    fi
+    
+    print_success "ASDF configured"
+    echo
 }
 
 # Add ASDF plugin
