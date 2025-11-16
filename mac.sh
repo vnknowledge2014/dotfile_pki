@@ -321,10 +321,16 @@ main() {
     configure_asdf
     load_config
     
-    print_info "Installing ASDF plugins and languages..."
+    if [[ ${#plugins[@]} -eq 0 ]]; then
+        print_error "No plugins loaded from plugins.json"
+        exit 1
+    fi
+    
+    print_info "Installing ASDF plugins and languages... (${#plugins[@]} plugins)"
     for entry in "${plugins[@]}"; do
         plugin_name="${entry%%=*}"
         plugin_url="${entry#*=}"
+        print_info "Adding plugin: $plugin_name"
         add_plugin "$plugin_name" "$plugin_url"
     done
     
