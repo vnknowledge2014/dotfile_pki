@@ -167,14 +167,14 @@ install_brew_packages() {
 }
 
 # Install Mac App Store apps
-install_mas_apps() {
-    print_info "Installing Mac App Store apps..."
-    for app_id in "${!mas_apps[@]}"; do
-        mas list | grep -q "$app_id" || mas install "$app_id"
-    done
-    print_success "Mac App Store apps installed"
-    echo
-}
+# install_mas_apps() {
+#     print_info "Installing Mac App Store apps..."
+#     for app_id in "${!mas_apps[@]}"; do
+#         mas list | grep -q "$app_id" || mas install "$app_id"
+#     done
+#     print_success "Mac App Store apps installed"
+#     echo
+# }
 
 # Load plugins config
 load_config() {
@@ -290,7 +290,7 @@ main() {
     install_homebrew
     
     # Install packages from brew-mas.json
-    load_brew_mas_config && install_brew_packages && install_mas_apps
+    load_brew_mas_config && install_brew_packages # && install_mas_apps
     
     set_default_shell
     install_oh_my_zsh
