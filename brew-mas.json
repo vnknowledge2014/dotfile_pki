@@ -17,16 +17,20 @@
     ],
     "casks": [
       "visual-studio-code",
-      "iterm2",
-      "docker",
+      "ghostty",
+      "orbstack",
       "postman",
-      "rectangle",
-      "raycast"
+      "iina",
+      "zalo",
+      "gotiengviet",
+      "font-fira-code-nerd-font",
+      "google-chrome"
     ]
   },
   "mas": {
-    "1352778147": "Bitwarden",
     "497799835": "Xcode",
-    "1295203466": "Microsoft Remote Desktop"
+    "747648890": "Telegram",
+    "1554411065": "Focus - Pomodoro & Focus Timer",
+    "1449106995": "NCalc Scientific Calculator +"
   }
 }
