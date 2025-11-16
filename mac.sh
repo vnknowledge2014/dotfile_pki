@@ -129,9 +129,9 @@ load_brew_mas_config() {
         return 1
     fi
     
-    declare -ga brew_formulae
-    declare -ga brew_casks
-    declare -gA mas_apps
+    brew_formulae=()
+    brew_casks=()
+    declare -A mas_apps
     
     while IFS= read -r formula; do
         brew_formulae+=("$formula")
@@ -184,9 +184,9 @@ load_config() {
         exit 1
     fi
     
-    declare -gA plugins
-    declare -ga manual_version_plugins
-    declare -gA recommended_versions
+    declare -A plugins
+    manual_version_plugins=()
+    declare -A recommended_versions
     
     while IFS='=' read -r key value; do
         plugins["$key"]="$value"
