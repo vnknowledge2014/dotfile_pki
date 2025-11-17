@@ -1,8 +1,7 @@
 {
   "plugins": {
     "uv": "https://github.com/asdf-community/asdf-uv.git",
-    "python": "https://github.com/asdf-community/asdf-python.git",
-    "java": "https://github.com/halcyon/asdf-java.git"
+    "python": "https://github.com/asdf-community/asdf-python.git"
   },
   "special_handling": {
     "manual_version": ["java"],
