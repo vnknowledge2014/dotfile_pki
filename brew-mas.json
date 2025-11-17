@@ -15,7 +15,8 @@
       "bat",
       "eza",
       "gh",
-      "asdf"
+      "asdf",
+      "gcloud-cli"
     ],
     "casks": [
       "visual-studio-code",
@@ -26,7 +27,9 @@
       "zalo",
       "gotiengviet",
       "font-fira-code-nerd-font",
-      "google-chrome"
+      "google-chrome",
+      "slack",
+      "discord"
     ]
   },
   "mas": {
