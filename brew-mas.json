@@ -16,7 +16,9 @@
       "eza",
       "gh",
       "asdf",
-      "gcloud-cli"
+      "gcloud-cli",
+      "mysql",
+      "pkgconf"
     ],
     "casks": [
       "visual-studio-code",
