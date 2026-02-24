@@ -32,7 +32,9 @@
       "google-chrome",
       "slack",
       "discord",
-      "zoom"
+      "zoom",
+      "the-unarchiver",
+      "antigravity"
     ]
   },
   "mas": {

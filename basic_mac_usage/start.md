@@ -1,0 +1,1 @@
+# basic mac usage cho người mới
