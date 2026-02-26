@@ -18,7 +18,9 @@
       "asdf",
       "gcloud-cli",
       "mysql",
-      "pkgconf"
+      "pkgconf",
+      "nvm",
+      "uv"
     ],
     "casks": [
       "visual-studio-code",
