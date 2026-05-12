@@ -1,11 +1,7 @@
 {
-  "plugins": {
-    "uv": "https://github.com/asdf-community/asdf-uv.git",
-    "python": "https://github.com/asdf-community/asdf-python.git"
-  },
+  "plugins": {},
   "special_handling": {
-    "manual_version": ["java"],
-    "recommended_versions": {
-    }
+    "manual_version": [],
+    "recommended_versions": {}
   }
 }

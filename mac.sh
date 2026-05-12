@@ -184,15 +184,15 @@ load_config() {
     recommended_versions=()
     
     while IFS= read -r line; do
-        plugins+=("$line")
-    done < <(jq -r '.plugins | to_entries[] | "\(.key)=\(.value)"' "$config_file")
+        [[ -n "$line" ]] && plugins+=("$line")
+    done < <(jq -r '.plugins | to_entries[] | "\(.key)=\(.value)"' "$config_file" 2>/dev/null || true)
     
     while IFS= read -r plugin; do
-        manual_version_plugins+=("$plugin")
-    done < <(jq -r '.special_handling.manual_version[]' "$config_file")
+        [[ -n "$plugin" ]] && manual_version_plugins+=("$plugin")
+    done < <(jq -r '.special_handling.manual_version[]' "$config_file" 2>/dev/null || true)
     
     while IFS= read -r line; do
-        recommended_versions+=("$line")
+        [[ -n "$line" ]] && recommended_versions+=("$line")
     done < <(jq -r '.special_handling.recommended_versions | to_entries[] | "\(.key)=\(.value)"' "$config_file" 2>/dev/null || true)
 }
 
@@ -315,6 +315,25 @@ configure_tools() {
     mkdir -p ~/.config/pip && echo -e "[global]\ncert = /etc/ssl/cert.pem" > ~/.config/pip/pip.conf
 }
 
+# Configure Podman aliases
+configure_podman_aliases() {
+    print_info "Configuring Podman aliases..."
+    local shell_config=$(detect_shell_config)
+    
+    if ! grep -q "PODMAN ALIASES" "$shell_config" 2>/dev/null; then
+        cat >> "$shell_config" << 'EOF'
+
+# PODMAN ALIASES
+alias docker=podman
+alias docker-compose=podman-compose
+EOF
+        print_success "Podman aliases configured"
+    else
+        print_success "Podman aliases already configured"
+    fi
+    echo
+}
+
 # Set Zsh as default shell
 set_default_shell() {
     [[ "$SHELL" == *"zsh"* ]] && return
@@ -339,46 +358,47 @@ main() {
     setup_certificates
     install_fonts
     setup_tmux
+    configure_podman_aliases
     
     configure_asdf
     load_config
     
-    if [[ ${#plugins[@]} -eq 0 ]]; then
-        print_error "No plugins loaded from plugins.json"
-        exit 1
-    fi
-    
-    print_info "Step 1: Adding plugins..."
-    echo
     failed_plugins=()
-    
-    for entry in "${plugins[@]}"; do
-        plugin_name="${entry%%=*}"
-        plugin_url="${entry#*=}"
-        if ! add_plugin "$plugin_name" "$plugin_url"; then
-            failed_plugins+=("$plugin_name")
-        fi
-    done
-    
-    echo
-    print_info "Step 2: Installing latest versions..."
-    echo
     failed_installs=()
-    
-    for entry in "${plugins[@]}"; do
-        plugin_name="${entry%%=*}"
-        
-        # Skip plugins that failed to add
-        if [[ " ${failed_plugins[*]} " =~ " $plugin_name " ]]; then
-            print_warning "Skipping $plugin_name installation (plugin add failed)"
-            continue
-        fi
-        
-        if ! install_latest "$plugin_name"; then
-            failed_installs+=("$plugin_name")
-        fi
+
+    if [[ ${#plugins[@]} -eq 0 ]]; then
+        print_info "No plugins loaded from plugins.json, skipping plugin setup."
+    else
+        print_info "Step 1: Adding plugins..."
         echo
-    done
+        
+        for entry in "${plugins[@]}"; do
+            plugin_name="${entry%%=*}"
+            plugin_url="${entry#*=}"
+            if ! add_plugin "$plugin_name" "$plugin_url"; then
+                failed_plugins+=("$plugin_name")
+            fi
+        done
+        
+        echo
+        print_info "Step 2: Installing latest versions..."
+        echo
+        
+        for entry in "${plugins[@]}"; do
+            plugin_name="${entry%%=*}"
+            
+            # Skip plugins that failed to add
+            if [[ " ${failed_plugins[*]} " =~ " $plugin_name " ]]; then
+                print_warning "Skipping $plugin_name installation (plugin add failed)"
+                continue
+            fi
+            
+            if ! install_latest "$plugin_name"; then
+                failed_installs+=("$plugin_name")
+            fi
+            echo
+        done
+    fi
     
     # Summary
     echo

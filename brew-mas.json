@@ -20,7 +20,11 @@
       "mysql",
       "pkgconf",
       "nvm",
-      "uv"
+      "uv",
+      "podman",
+      "podman-compose",
+      "mise"
+
     ],
     "casks": [
       "visual-studio-code",
@@ -36,7 +40,9 @@
       "discord",
       "zoom",
       "the-unarchiver",
-      "antigravity"
+      "antigravity",
+      "cloudflare-warp",
+      "podman-desktop"
     ]
   },
   "mas": {
