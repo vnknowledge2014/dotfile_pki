@@ -15,12 +15,12 @@ mise use --global databricks-cli@latest
 mise use -g node@latest
 
 mise use --global spark@4.1.1
-
-MISE_HTTP_TIMEOUT=600 mise use --global spark@4.1.1
+# spark 4.1.1 might be too new to be install
+mise use --global spark@4.1.0
 
 mise plugin install spark https://github.com/mise-plugins/mise-spark
 
-mise uninstall spark@3.5.1
+
 
 source ~/.zshrc
 ```
@@ -37,6 +37,7 @@ databricks-cli  0.299.1  ~/.config/mise/config.toml  latest
 java            21.0.2   ~/.config/mise/config.toml  21
 node            26.1.0   ~/.config/mise/config.toml  latest
 python          3.14.4   ~/.tool-versions            3.14.4
+spark           4.1.0    ~/.config/mise/config.toml  4.1.0
 terraform       1.15.2   ~/.config/mise/config.toml  latest
 uv              0.11.13  ~/.config/mise/config.toml  0.11.13
 ```

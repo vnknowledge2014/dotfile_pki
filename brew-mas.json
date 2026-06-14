@@ -41,8 +41,12 @@
       "zoom",
       "the-unarchiver",
       "antigravity",
+      "antigravity-ide",
+      "antigravity-cli",
       "cloudflare-warp",
-      "podman-desktop"
+      "podman-desktop",
+      "claude",
+      "claude-code"
     ]
   },
   "mas": {
